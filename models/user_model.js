@@ -18,6 +18,37 @@ exports.getAllUsers =function(data,next)
     }
 }
 
+exports.otpConf = function(data, next){
+    try{
+        data.collection ="otpes";
+        data.where = {contactNumber:data.payload.contactNumber};
+        dbService.read(data, function (err, result) {
+            return next(err, result);
+        });
+  
+    }catch (e) {
+        logger.error("Exception:" );
+        logger.error(e.stack);
+        utils.serverException(e, next);
+    }
+  
+  
+  }
+
+  exports.sendOtp=function(data,next){
+    try{
+                data.collection="otpes",
+                dbService.create(data,function(err,results){
+                  return next(err, results);
+                });
+    }catch (e)
+    {
+      logger.error("Exception:" );
+      logger.error(e.stack);
+      utils.serverException(e, next);   
+    }
+}
+
 exports.signup=function(data,next){
       try{
                   data.collection="users",

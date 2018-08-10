@@ -18,6 +18,13 @@ module.exports ={
             
             }
     },
+    sendOtp:{
+        body:{
+            payload:joi.object({
+                contactNumber: joi.number().required()    
+            }).required(),
+        }
+    },
     signup:{
         body:{
             payload:joi.object({

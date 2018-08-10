@@ -5,6 +5,7 @@
    var utils = require('../utils');
    var async = require('async');
    var sessionManager = require('./session_manager_ctrl');
+   var emailSender = require('../services/email_services');
    
 
   
@@ -46,6 +47,7 @@
             utils.serverException(e, next);
    }
    }
+
    exports.signup=function(req,res,next)
    {
            try{
@@ -54,14 +56,30 @@
             var data ={};
             data.payload=req.body.payload;
             data.serveFrom=constants.servingFromDB;
-            data.route="signup";
             async.waterfall([
                 function(callback){
-                    requestBroker.send(data,function(err,response){ 
-                         return callback(err,response);
+                    data.route = "otpConf";
+                    requestBroker.send(data, function (error, response) {
+                        if(error){
+                            return callback(error, response);
+                        }else{
+                            return callback(error, response);
+                        }
+                        
                     });
+                },
+                function(response, callback){
+                    if(response.contactNumber==otPData.contactNumber && response.otp == otPData.otp){
+                        data.route = "signup";
+                        requestBroker.send(data, function (error, response) {
+                        return callback(error, response);
+                    });
+                    }else{
+                        var error ={code: "RC005", message: "Not Authorize to signup" }
+                        return callback(error); 
+                    }
                     
-                  }
+                },
 
          ],
 
@@ -82,6 +100,47 @@
     }
 
    }
+
+   exports.sendOtp = function(req, res, next){
+    try{
+        logger.debug("request body : " + JSON.stringify(req.body));
+        var data  = {};
+        var otpData = {};
+        var otp = Math.floor(100000 + Math.random() * 900000)
+        otpData.otp = otp;
+        otpData.contactNumber = req.body.payload.contactNumber;
+        data.payload = otpData;
+        //Sending mail
+        emailSender.sendMail(otp);
+        //end       
+        data.serveFrom = constants.servingFromDB;
+        data.route = "sendOtp";
+        async.waterfall([
+
+            function(callback){
+                requestBroker.send(data, function (error, response) {
+                    return callback(error, response);
+                });
+            }
+
+        ], function(err, results){
+            if(err){
+                return next(err);
+            }
+            else{
+                return next(results);
+            }
+        });
+
+
+    }catch(e){
+        logger.error("Exception:" );
+        logger.error(e.stack);
+        utils.serverException(e, next);
+    }
+
+}
+
    exports.login = function(req, res, next){
     try{
         logger.debug("request body : " + JSON.stringify(req.body));

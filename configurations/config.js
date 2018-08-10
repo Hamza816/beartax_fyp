@@ -17,6 +17,14 @@ module.exports = {
             username :"",
             password :"",
         }
+    },email:{
+        from:"sender mail",
+        services: "gmail",
+        password : "passward",
+        otp :{           
+            subject : "no-reply-emailVerification",
+            html : "Type this code to signup ",
+        }
     },
     supportedDB : constants.supportedDatabases.mongodb
 }

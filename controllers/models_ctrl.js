@@ -11,13 +11,19 @@ function sendRequest(route,data, next) {
             case 'getAllUsers':
                 models.users.getAllUsers(data, next);
                 break;
-          case 'signup':
+            case 'sendOtp':
+                models.users.sendOtp(data, next);
+                break;
+            case 'otpConf':
+                models.users.otpConf(data, next);
+                break;
+            case 'signup':
                 models.users.signup(data, next);
                 break;
-        case 'login':
+            case 'login':
                 models.users.login(data, next);
                 break;
-           case 'exchanges':
+            case 'exchanges':
                 models.exchanges.exchanges(data, next);
                 break;
                
